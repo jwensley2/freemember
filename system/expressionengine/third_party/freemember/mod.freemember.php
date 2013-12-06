@@ -385,7 +385,9 @@ class Freemember
     protected function _action_complete($errors = null)
     {
         if (empty($errors)) {
-            if (($return_url = ee()->input->get_post('return_url')) != '') {
+            if (ee()->freemember->form_param('ajax') == 'yes') {
+                $this->_return_json(array('success' => true));
+            } elseif (($return_url = ee()->input->get_post('return_url')) != '') {
                 $return_url = ee()->functions->create_url($return_url);
                 if (isset($_POST['_params']) && ee()->freemember->form_param('secure_return') == 'yes') {
                     $return_url = str_replace('http://', 'https://', $return_url);
@@ -401,8 +403,25 @@ class Freemember
             ee()->functions->redirect($return_url);
         } elseif (ee()->freemember->form_param('error_handling') == 'inline') {
             return ee()->core->generate_page();
+        } elseif (ee()->freemember->form_param('ajax') == 'yes') {
+            $return = array(
+                'success' => false,
+                'errors' => $errors,
+            );
+
+            $this->_return_json($return);
         }
 
         return ee()->output->show_user_error(false, $errors);
+    }
+
+    /*
+     * Return a JSON string
+     */
+    protected function _return_json($return)
+    {
+        header("Content-Type: application/json");
+        echo json_encode($return);
+        exit;
     }
 }
