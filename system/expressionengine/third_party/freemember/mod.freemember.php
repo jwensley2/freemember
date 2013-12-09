@@ -385,7 +385,7 @@ class Freemember
     protected function _action_complete($errors = null)
     {
         if (empty($errors)) {
-            if (ee()->freemember->form_param('ajax') == 'yes') {
+            if (isset($_POST['_params']) && ee()->freemember->form_param('ajax') == 'yes') {
                 $this->_return_json(array('success' => true));
             } elseif (($return_url = ee()->input->get_post('return_url')) != '') {
                 $return_url = ee()->functions->create_url($return_url);
